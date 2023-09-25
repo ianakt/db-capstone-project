@@ -21,7 +21,7 @@ SELECT DISTINCT Orders.OrderID, Orders.BillAmount, employees.Name, employees.Emp
   JOIN employees on employees.EmployeeID = Bookings.EmployeeID
 
 
--- Task 3 Week 3
+-- Task 3 Week 2
 
 -- A itemfreq is a view of menu items, and how often they appear from most frequent to least frequent
 -- The deliverable for task 3 is on lines 37 through 40
@@ -34,13 +34,39 @@ Select menuitems.Name, Count(*) as frequency
 GROUP BY menuitems.Name
 ORDER BY Count(*) DESC;
 
--- TASK 3 week 3 deliverable
+-- TASK 3 week 2 deliverable
 Select Name 
 FROM itemfreq 
 WHERE frequency > 2;
 
+-- Max Quantity from Orders
+CREATE PROCEDURE GetMaxQuantity()
+SELECT Max(Quantity) AS "Max Quantity in Order" FROM Orders;
+
+CALL GetMaxQuantity
 
 
--- GROUP BY menuitems.Name
--- ORDER BY Count(*) DESC
--- WHERE Count(*) > 2
+-- prepared statement for getting order detail
+PREPARE GetOrderDetail FROM
+'SELECT DISTINCT Orders.OrderID, Orders.BillAmount, Orders.Quantity
+  FROM Orders 
+  JOIN Menus ON Orders.MenuID = menus.MenuID
+  JOIN menuitems ON menuitems.ItemID = menus.ItemID
+  JOIN Bookings ON Orders.TableNo = Bookings.TableNo
+  JOIN employees on employees.EmployeeID = Bookings.EmployeeID
+WHERE employees.EmployeeID = ?';
+
+SET @id = 1;
+EXECUTE GetOrderDetail USING @id;
+
+
+
+-- Cancel Order Procedure
+DELIMITER //
+CREATE PROCEDURE CancelOrder(IN OrderID INT)
+BEGIN
+DELETE FROM Orders WHERE OrderID = OrderID;
+SELECT CONCAT("Order ", OrderID, " is cancelled") AS Confirmation;
+END //
+DELIMITER ;
+
