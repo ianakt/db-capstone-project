@@ -2,6 +2,9 @@
 --Task 1 week 2 Created Orders view
 --CREATE VIEW OrdersView AS select OrderID, BillAmount, Quantity FROM Orders;
 
+-- Orders, Bill Amount and Quantity, where quantity is more than 2
+-- Please not that this returns an empty set 
+-- because no quantity was greater than 2 with the data I have
 
 CREATE VIEW OrdersView AS 
 SELECT DISTINCT Orders.OrderID, Orders.Quantity, Orders.BillAmount
@@ -23,9 +26,9 @@ SELECT DISTINCT Orders.OrderID, Orders.BillAmount, employees.Name, employees.Emp
 
 -- Task 3 Week 2
 
--- A itemfreq is a view of menu items, and how often they appear from most frequent to least frequent
--- The deliverable for task 3 is on lines 37 through 40
+-- The deliverable for task 3 is on lines 37 through 40, I didn't use a subquery, I selected from a view
 
+-- A itemfreq is a view of menu items, and how often they appear from most frequent to least frequent
 CREATE VIEW itemfreq AS
 Select menuitems.Name, Count(*) as frequency
   FROM Orders 
@@ -43,7 +46,7 @@ WHERE frequency > 2;
 CREATE PROCEDURE GetMaxQuantity()
 SELECT Max(Quantity) AS "Max Quantity in Order" FROM Orders;
 
-CALL GetMaxQuantity
+CALL GetMaxQuantity()
 
 
 -- prepared statement for getting order detail
@@ -70,3 +73,32 @@ SELECT CONCAT("Order ", OrderID, " is cancelled") AS Confirmation;
 END //
 DELIMITER ;
 
+-- BookingID, BookingDate, TableNumber ,CustomerID
+-- 1, 2022-10-10, 5, 1
+-- 2, 2022-11-12, 3, 3
+-- 3, 2022-10-11, 2, 2
+-- 4, 2022-10-13, 2 ,1
+
+-- How to do Case When?
+-- Shall we try other flow control functions IF()
+-- https://dev.mysql.com/doc/refman/8.0/en/flow-control-functions.html
+-- CheckBooking procedure
+
+DELIMITER //
+CREATE PROCEDURE CheckBooking(IN BookingSlot TIME,IN TableNo INT)
+          SET BookingSlot AS A;
+          SET TableNo AS B;
+          SELECT CONCAT("Slot ",BookingSlot," at table ", TableNo," has been taken") AS "Booking Status" FROM Bookings WHERE BookingSlot = BookingSlot AND WHERE TableNo = TableNo;
+DELIMITER ;
+
+
+CREATE PROCEDURE CheckBooking(IN BookingTime TIME,IN TableNumber INT)
+          SELECT 
+          IF(count(*) > 0, CONCAT("Table ", TableNumber, " is already booked."), CONCAT("Table ", TableNumber, " is available")) AS "Booking Status"
+          FROM Bookings 
+          WHERE BookingSlot = BookingTime AND 
+          TableNo = TableNumber;
+
+
+
+-- AddValidBooking
