@@ -82,16 +82,9 @@ DELIMITER ;
 -- How to do Case When?
 -- Shall we try other flow control functions IF()
 -- https://dev.mysql.com/doc/refman/8.0/en/flow-control-functions.html
+
+
 -- CheckBooking procedure
-
-DELIMITER //
-CREATE PROCEDURE CheckBooking(IN BookingSlot TIME,IN TableNo INT)
-          SET BookingSlot AS A;
-          SET TableNo AS B;
-          SELECT CONCAT("Slot ",BookingSlot," at table ", TableNo," has been taken") AS "Booking Status" FROM Bookings WHERE BookingSlot = BookingSlot AND WHERE TableNo = TableNo;
-DELIMITER ;
-
-
 CREATE PROCEDURE CheckBooking(IN BookingTime TIME,IN TableNumber INT)
           SELECT 
           IF(count(*) > 0, CONCAT("Table ", TableNumber, " is already booked."), CONCAT("Table ", TableNumber, " is available")) AS "Booking Status"
